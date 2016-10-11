@@ -17,3 +17,7 @@ Next, install all dependencies:
 Finally, to run the app:
 
 `python app.py`
+
+To leave the virtualenv:
+
+`deactivate`
