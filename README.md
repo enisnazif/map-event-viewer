@@ -4,7 +4,7 @@
 
 First, create a virtualenv environment:
 
-`virtualenv env --clean`
+`virtualenv env --clear`
 
 Enter this environment:
 
