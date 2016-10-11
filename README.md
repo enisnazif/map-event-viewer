@@ -2,7 +2,11 @@
 
 `cd map-event-viewer`
 
-First, load the environment:
+First, create a virtualenv environment:
+
+`virtualenv env --clean`
+
+Enter this environment:
 
 `source env/bin/activate`
 
