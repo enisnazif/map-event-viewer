@@ -1,21 +1,11 @@
 from flask import Flask, render_template
-import psycopg2
-
-
-#Try to connect to the local postgreSQL database 'divvy' as Enis
-try:
-    conn=psycopg2.connect("host='localhost' dbname='divvy' user='Enis'")
-except:
-    print "Unable to connect"
-
-#If connection was sucessful, create a cursor, and try a simple query
-cursor = conn.cursor()
-cursor.execute("SELECT * FROM trips")
-records = cursor.fetchall()
-
-print records[1]
+from data_load import get_stations
+from flask_sqlalchemy import SQLAlchemy
+import json
 
 app = Flask(__name__)
+app.config.from_pyfile('config.py')
+db = SQLAlchemy(app)
 
 @app.route('/')
 def showLanding():
@@ -23,11 +13,12 @@ def showLanding():
 
 @app.route("/map")
 def showMap():
-    return render_template('map.html')
+    stations = get_stations('Enis');
+    return render_template('map.html', stations=stations)
 
 @app.route("/events")
 def showEvents():
     return render_template('events.html')
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
