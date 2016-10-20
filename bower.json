@@ -1,0 +1,23 @@
+{
+  "name": "map-event-viewer",
+  "homepage": "https://github.com/enisnazif/map-event-viewer",
+  "authors": [
+    "Enis <e.nazif@warwick.ac.uk>"
+  ],
+  "description": "frontend dependencies for map-event-viewer",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "static/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "leaflet": "^1.0.1"
+  }
+}

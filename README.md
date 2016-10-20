@@ -1,3 +1,6 @@
+# Dependencies
+This project requires bower for the management of front-end dependencies
+
 # Installation 
 
 `cd map-event-viewer`
@@ -13,10 +16,11 @@ Enter this environment:
 Next, install all dependencies:
 
 `pip install -r requirements.txt`
+`bower install`
 
 Finally, to run the app:
 
-`python app.py`
+`python app.py` and visit `127.0.0.1:5000`
 
 To leave the virtualenv:
 
