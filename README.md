@@ -15,8 +15,8 @@ Enter this environment:
 
 Next, install all dependencies:
 
-`pip install -r requirements.txt`
-`bower install`
+`pip install -r requirements.txt` and then 
+`bower install` to get all front-end dependencies
 
 Finally, to run the app:
 
