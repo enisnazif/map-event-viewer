@@ -4,18 +4,41 @@
 <head>
 	<link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/static/bower_components/leaflet/dist/leaflet.css"/>
+	<link rel="stylesheet" href="/static/bower_components/sidebar-v2/css/leaflet-sidebar.css" />
+	<link rel="stylesheet" href="/static/bower_components/font-awesome/css/font-awesome.min.css">
 	<script src="/static/bower_components/leaflet/dist/leaflet.js"></script>
 	<script src="{{ url_for('static', filename='map/map.js') }}"></script>
 </head>
 
 <body>
-  <ul class="nav nav-tabs">
-		<li role="presentation"><a href="/"> Home </a></li>
-	  <li role="presentation" class="active"><a href="/map"> Map </a></li>
-	  <li role="presentation"><a href="/events"> Events </a></li>
-	</ul>
+	<div id="sidebar" class="sidebar collapsed">
+			<!-- Nav tabs -->
+			<div class="sidebar-tabs">
+					<ul role="tablist">
+							<li><a href="#parameters" role="tab"><i class="fa fa-sliders"></i></a></li>
+							<li><a href="#events" role="tab"><i class="fa fa-exclamation-circle"></i></a></li>
+					</ul>
+					<ul role="tablist">
+							<li><a href="#settings" role="tab"><i class="fa fa-gear"></i></a></li>
+					</ul>
+			</div>
+
+			<!-- Tab panes -->
+			<div class="sidebar-content">
+					<div class="sidebar-pane" id="parameters">
+							<h1 class="sidebar-header">Parameters<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+					</div>
+					<div class="sidebar-pane" id="events">
+							<h1 class="sidebar-header">Events<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+					</div>
+					<div class="sidebar-pane" id="settings">
+							<h1 class="sidebar-header">Settings<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+					</div>
+			</div>
+	</div>
 	<div id="mapid" style="width: 1920px; height: 1080px;"></div>
-	<script> draw_map_with_stations({{ stations|tojson }}); </script>
+	<script src="/static/bower_components/sidebar-v2/js/leaflet-sidebar.js"></script>
+	<script> plot_districts_and_stations({{ districts | tojson}}, {{ stations | tojson}}) </script>
 </body>
 
 </html>

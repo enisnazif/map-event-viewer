@@ -1,6 +1,8 @@
 from sqlalchemy import Integer, Text, Float, Date, TIMESTAMP, Table, Column
+from geoalchemy2 import Geometry
 from database import Base
 
+#stations table
 class Stations(Base):
     __tablename__ = 'stations'
 
@@ -11,10 +13,11 @@ class Stations(Base):
     dpcapacity = Column(Integer)
     online_date = Column(Date)
 
+#trips table
 class Trips(Base):
     __tablename__ = 'trips'
 
-    trip_id = Column(Integer, primary_key=True) #Work out why I can't set this as PK
+    trip_id = Column(Integer, primary_key=True) #Work out why I can't set this as PK for all data
     starttime = Column(TIMESTAMP)
     stoptime = Column(TIMESTAMP)
     bikeid = Column(Integer)
@@ -26,3 +29,6 @@ class Trips(Base):
     usertype = Column(Text)
     gender = Column(Text)
     birthday = Column(Integer)
+
+
+#class Districts(Base):

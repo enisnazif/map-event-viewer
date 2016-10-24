@@ -53,18 +53,9 @@ def populate_divvy():
     populate_divvy_stations()
     populate_divvy_trips()
 
-#Gets the names and coordinates of stations in the stations table
-def get_divvy_stations():
-    engine_rc = engine.raw_connection()
-    cursor = engine_rc.cursor()
-    cursor.execute("SELECT name,latitude,longitude FROM stations")
-    records = cursor.fetchall()
-    return records
-
+#Imports and creates all models and populates the data
 def init_db():
     from models import Stations, Trips
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     populate_divvy()
-
-################################################################################
