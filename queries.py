@@ -8,13 +8,14 @@ cursor = engine_rc.cursor()
 def add_station_geom():
     cursor.execute("ALTER TABLE stations ADD COLUMN geom geometry(POINT,4326);")
     cursor.execute("UPDATE stations SET geom = ST_SetSRID(ST_MakePoint(longitude,latitude),4326);")
-    
+
 #Gets the names and coordinates of all stations in the stations table
 def get_divvy_stations():
     cursor.execute("SELECT name, ST_AsGeoJson(geom) FROM stations")
     result = cursor.fetchall()
     return result
 
+#Returns in geoJSON format a list of points describing each district of Chicago
 def get_chicago_districts():
     cursor.execute("SELECT area_numbe, community, ST_AsGeoJson(geom) FROM DISTRICTS;")
     result = cursor.fetchall()
@@ -38,5 +39,17 @@ def get_trips_originating_at(station_id):
 #Gets all the trips terminating at the station with id 'station_id'
 def get_trips_terminating_at(station_id):
     cursor.execute("SELECT * FROM TRIPS WHERE to_station_id = " + station_id )
+    result = cursor.fetchall()
+    return result
+
+#Gets all the trips with a starttime between start_time and end_time
+def get_trips_beginning_between_times(start_time, end_time):
+    cursor.execute("SELECT * FROM TRIPS WHERE starttime BETWEEN '" + start_time + "'::timestamp AND '" + end_time + "'::timestamp;")
+    result = cursor.fetchall()
+    return result
+
+#Gets all the trips with a stoptime between start_time and end_time
+def get_trips_ending_between_times(start_time, end_time):
+    cursor.execute("SELECT * FROM TRIPS WHERE stoptime BETWEEN '" + start_time + "'::timestamp AND '" + end_time + "'::timestamp;")
     result = cursor.fetchall()
     return result

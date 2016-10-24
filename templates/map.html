@@ -27,18 +27,44 @@
 			<div class="sidebar-content">
 					<div class="sidebar-pane" id="parameters">
 							<h1 class="sidebar-header">Parameters<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+							<br>
+							<label for="basic-url">Date Range</label>
+							<div class="input-group">
+							    <input type="text" class="form-control">
+							</div>
+							<br>
+							<label for="basic-url">Time Range</label>
+							<div class="input-group">
+							    <input type="text" class="form-control">
+							</div>
 					</div>
 					<div class="sidebar-pane" id="events">
 							<h1 class="sidebar-header">Events<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+							<br>
+							<label for="basic-url">Detected Events</label>
 					</div>
 					<div class="sidebar-pane" id="settings">
 							<h1 class="sidebar-header">Settings<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
+							<br>
+							<label for="basic-url">Dataset</label>
+							<div class="input-group">
+									<input type="text" class="form-control">
+							</div>
+							<br>
+							<label for="basic-url">Detection Method</label>
+							<div class="input-group">
+									<input type="text" class="form-control">
+							</div>
 					</div>
 			</div>
 	</div>
 	<div id="mapid" style="width: 1920px; height: 1080px;"></div>
 	<script src="/static/bower_components/sidebar-v2/js/leaflet-sidebar.js"></script>
-	<script> plot_districts_and_stations({{ districts | tojson}}, {{ stations | tojson}}) </script>
+	<script>
+		draw_map();
+		plot_districts({{ districts | tojson }});
+		plot_stations({{ stations | tojson }});
+	</script>
 </body>
 
 </html>
