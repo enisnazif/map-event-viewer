@@ -1,7 +1,7 @@
 # Dependencies
 This project requires bower for the management of front-end dependencies
 
-# Installation 
+# Installation
 
 `cd map-event-viewer`
 
@@ -15,12 +15,12 @@ Enter this environment:
 
 Next, install all dependencies:
 
-`pip install -r requirements.txt` and then 
+`pip install -r requirements.txt` and then
 `bower install` to get all front-end dependencies
 
 Finally, to run the app:
 
-`python app.py` and visit `127.0.0.1:5000`
+First run `export FLASK_APP=app.py` and then run `flask run` and visit `127.0.0.1:5000`
 
 To leave the virtualenv:
 

@@ -1,15 +1,33 @@
 <!DOCTYPE html>
 <html>
 
+<!--Import eveeeeerything-->
 <head>
+	<!--Front end dependencies from bower-->
 	<link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="/static/bower_components/leaflet/dist/leaflet.css"/>
 	<link rel="stylesheet" href="/static/bower_components/sidebar-v2/css/leaflet-sidebar.css" />
 	<link rel="stylesheet" href="/static/bower_components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/static/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css" />
+	<script src="/static/bower_components/jquery/dist/jquery.js"></script>
 	<script src="/static/bower_components/leaflet/dist/leaflet.js"></script>
+	<script src="/static/bower_components/moment/moment.js"></script>
+	<script src="/static/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+	<script src="/static/bower_components/bootstrap/js/dropdown.js"></script>
+
+	<!--Back end dependencies from npm (eventually)-->
+	<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+
+	<!-- Import custom scripts -->
 	<script src="{{ url_for('static', filename='map/map.js') }}"></script>
+
+	<!--initialise socketio connection-->
+	<script type="text/javascript" charset="utf-8">
+	    var socket = io.connect('http://' + document.domain + ':' + location.port);
+	</script>
 </head>
 
+<!--Declare the sidebar-->
 <body>
 	<div id="sidebar" class="sidebar collapsed">
 			<!-- Nav tabs -->
@@ -17,53 +35,161 @@
 					<ul role="tablist">
 							<li><a href="#parameters" role="tab"><i class="fa fa-sliders"></i></a></li>
 							<li><a href="#events" role="tab"><i class="fa fa-exclamation-circle"></i></a></li>
-					</ul>
-					<ul role="tablist">
 							<li><a href="#settings" role="tab"><i class="fa fa-gear"></i></a></li>
 					</ul>
 			</div>
 
-			<!-- Tab panes -->
+			<!-- Declare the sidebar tab panes and their content -->
 			<div class="sidebar-content">
+					<!-- Content of parameters pane -->
 					<div class="sidebar-pane" id="parameters">
 							<h1 class="sidebar-header">Parameters<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
 							<br>
-							<label for="basic-url">Date Range</label>
-							<div class="input-group">
-							    <input type="text" class="form-control">
-							</div>
+							<form>
+								<label>Date / Time Range</label>
+									<br>
+									<div class='input-group date' id='start_timepicker'>
+			                <input type='text' class="form-control" id='start_date_time'/>
+			                  <span class="input-group-addon">
+			                      <span class="glyphicon glyphicon-calendar"></span>
+			                </span>
+			            </div>
+			        		<script type="text/javascript">
+				            $(function () {
+											var dateNow = new Date();
+											$('#start_timepicker').datetimepicker({
+													defaultDate:'01-01-2013 00:00:00'
+											});
+				            });
+									</script>
+			            <div class='input-group date' id='end_timepicker'>
+			                <input type='text' class="form-control" id='end_date_time' />
+			                  <span class="input-group-addon">
+			                      <span class="glyphicon glyphicon-calendar"></span>
+			                </span>
+			            </div>
+					        <script type="text/javascript">
+					            $(function () {
+												var dateNow = new Date();
+								        $('#end_timepicker').datetimepicker({
+								            defaultDate:dateNow
+								        });
+					            });
+					        </script>
 							<br>
-							<label for="basic-url">Time Range</label>
-							<div class="input-group">
-							    <input type="text" class="form-control">
-							</div>
+								<label> Stations</label>
+									<div class="checkbox">
+									  <label><input type="checkbox" id='toggle_stations'></label>
+									</div>
+								<label>Events</label>
+									<div class="checkbox">
+									  <label><input type="checkbox" id='toggle_events'></label>
+									</div>
+								<label>Trips</label>
+									<div class="checkbox">
+									  <label><input type="checkbox" checked="checked" id='toggle_trips'></label>
+									</div>
+									<script>
+										$(function() {
+											$('#toggle_trips, #toggle_events, #toggle_stations').change(function() {
+															socket.emit('parameters_updated', {
+																date_start: document.getElementById('start_date_time').value,
+																date_end: document.getElementById('end_date_time').value,
+																show_stations: document.getElementById('toggle_stations').checked,
+																show_events: document.getElementById('toggle_events').checked,
+																show_trips: document.getElementById('toggle_trips').checked
+															});
+											});
+										});
+
+										//bit of a hack, but required to get the date/time changes
+										$(function() {
+											$('#start_timepicker, #end_timepicker').on("dp.hide",function() {
+															socket.emit('parameters_updated', {
+																date_start: document.getElementById('start_date_time').value,
+																date_end: document.getElementById('end_date_time').value,
+																show_stations: document.getElementById('toggle_stations').checked,
+																show_events: document.getElementById('toggle_events').checked,
+																show_trips: document.getElementById('toggle_trips').checked
+															});
+											});
+										});
+									</script>
+								</form>
 					</div>
+
+					<!-- Content of events pane -->
 					<div class="sidebar-pane" id="events">
 							<h1 class="sidebar-header">Events<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
 							<br>
-							<label for="basic-url">Detected Events</label>
+							<label>Detected Events</label>
+							<ul id="events">
+								<li> Event 1 </li>
+								<li> Event 2 </li>
+								<li> Event 3 </li>
+								<li> Event 4 </li>
+							</ul>
 					</div>
+
+					<!-- Content of settings pane -->
 					<div class="sidebar-pane" id="settings">
 							<h1 class="sidebar-header">Settings<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
 							<br>
-							<label for="basic-url">Dataset</label>
-							<div class="input-group">
-									<input type="text" class="form-control">
-							</div>
-							<br>
-							<label for="basic-url">Detection Method</label>
-							<div class="input-group">
-									<input type="text" class="form-control">
-							</div>
+								<form id='settings_form'>
+									<label>Dataset</label>
+								  <select class="form-control" name="dataset" id="dataset">
+									  <option {% if dataset == 'Divvy' %} selected="selected" {% endif %}>Divvy</option>
+									  <option {% if dataset == 'New York Taxi' %} selected="selected" {% endif %}>New York Taxi</option>
+									</select>
+									<br>
+									<label>Detection Method</label>
+									<select class="form-control" name="detection_method" id="detection_method">
+										<option {% if detection_method == 'Method A' %} selected="selected" {% endif %}>Method A</option>
+										<option {% if detection_method == 'Method B' %} selected="selected" {% endif %}>Method B</option>
+										<option {% if detection_method == 'Method C' %} selected="selected" {% endif %}>Method C</option>
+									</select>
+
+									<!-- A script that destroys the current map, and draws a new one when the dataset is changed-->
+									<script>
+										$(function() {
+											$('#dataset').change(function() {
+															remove_map()
+															draw_map($("#dataset :selected").text())
+															socket.emit('settings_updated', {dataset: $("#dataset :selected").text(), detection_method: $("#detection_method :selected").text()});
+											});
+										});
+
+										$(function() {
+											$('#detection_method').change(function() {
+															socket.emit('settings_updated', {dataset: $("#dataset :selected").text(), detection_method: $("#detection_method :selected").text()});
+											});
+										});
+
+
+									</script>
+								</form>
 					</div>
 			</div>
 	</div>
-	<div id="mapid" style="width: 1920px; height: 1080px;"></div>
+
+	<!-- Declare our leaflet map -->
+	<div id="mapid" style="width: 1920px; height: 1200px;"></div>
 	<script src="/static/bower_components/sidebar-v2/js/leaflet-sidebar.js"></script>
-	<script>
-		draw_map();
-		plot_districts({{ districts | tojson }});
-		plot_stations({{ stations | tojson }});
+
+	<!--This is where the map is actually drawn and plotted upon-->
+		{% if dataset == 'Divvy' %}
+			<script>
+			draw_map({{ dataset | tojson }})
+			plot_districts({{ districts | tojson }})
+			plot_stations({{ stations | tojson }})
+			</script>
+		{% endif %}
+		{% if dataset == 'New York Taxi' %}
+			<script>
+			draw_map({{ dataset | tojson }})
+			</script>
+		{% endif %}
+
 	</script>
 </body>
 
