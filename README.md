@@ -20,7 +20,7 @@ Next, install all dependencies:
 
 Finally, to run the app:
 
-First run `export FLASK_APP=app.py` and then run `flask run` and visit `127.0.0.1:5000`
+First run `export FLASK_APP=map-event-viewer.py` and then run `flask run` and visit `127.0.0.1:5000`
 
 To leave the virtualenv:
 
