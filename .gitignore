@@ -1,4 +1,6 @@
 /env/
 /data/
 /static/bower_components/
+/node_modules/
 *.pyc
+

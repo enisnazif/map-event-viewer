@@ -1,13 +1,11 @@
-from database import db_session, engine
+import psycopg2
 
-#create the raw_connection and engine for SQL statements
-engine_rc = engine.raw_connection()
-cursor = engine_rc.cursor()
+try:
+    conn = psycopg2.connect("dbname='divvy' user=Enis host='localhost' password=''")
+except:
+    print "I am unable to connect to the database"
 
-#adds the geom column to stations
-def add_station_geom():
-    cursor.execute("ALTER TABLE stations ADD COLUMN geom geometry(POINT,4326);")
-    cursor.execute("UPDATE stations SET geom = ST_SetSRID(ST_MakePoint(longitude,latitude),4326);")
+cursor = conn.cursor()
 
 #Gets the names and coordinates of all stations in the stations table
 def get_divvy_stations():
@@ -17,7 +15,12 @@ def get_divvy_stations():
 
 #Returns in geoJSON format a list of points describing each district of Chicago
 def get_chicago_districts():
-    cursor.execute("SELECT area_numbe, community, ST_AsGeoJson(geom) FROM DISTRICTS;")
+    cursor.execute("SELECT area_numbe, community, ST_AsGeoJson(geom) FROM districts;")
+    result = cursor.fetchall()
+    return result
+
+def get_chicago_neighborhoods():
+    cursor.execute("SELECT gid, pri_neigh, ST_AsGeoJson(geom) FROM neighborhoods;")
     result = cursor.fetchall()
     return result
 
@@ -51,5 +54,10 @@ def get_trips_beginning_between_times(start_time, end_time):
 #Gets all the trips with a stoptime between start_time and end_time
 def get_trips_ending_between_times(start_time, end_time):
     cursor.execute("SELECT * FROM TRIPS WHERE stoptime BETWEEN '" + start_time + "'::timestamp AND '" + end_time + "'::timestamp;")
+    result = cursor.fetchall()
+    return result
+
+def get_trips_beginning_and_ending_between_times(start_time, end_time):
+    cursor.execute("SELECT * FROM TRIPS WHERE start_time = '" + start_time + "'::timestamp AND stop_time = '" + end_time + "'::timestamp;")
     result = cursor.fetchall()
     return result
