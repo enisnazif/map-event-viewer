@@ -6,9 +6,11 @@ from flask_socketio import SocketIO
 app = Flask(__name__)
 socketio = SocketIO(app)
 
-stations = divvy_queries.get_divvy_stations()
-districts = divvy_queries.get_chicago_districts()
-events =
+stations = None
+districts = None
+precincts = None
+events = None
+
 #declare all template variables and set to null
 dataset = None
 detection_method = None
@@ -21,14 +23,33 @@ start_date_time = None
 @app.route("/")
 def show_map():
     #set default values for template variables
+    stations = divvy_queries.get_divvy_stations()
+    #only need one of these...
+    districts = divvy_queries.get_chicago_districts()
+    precincts = divvy_queries.get_chicago_precincts()
     dataset = 'Divvy'
     detection_method = 'Method A'
     show_stations = 'True'
     show_trips = 'True'
     show_events = 'True'
-    end_date_time = '01-01-2013 00:00:00'
-    start_date_time = '12-31-2016 00:00:00'
-    return render_template('map.html', stations=stations, districts=districts, dataset=dataset, detection_method=detection_method, events=events)
+    start_date_time = '01-01-2013 00:00:00'
+    end_date_time = '12-31-2016 00:00:00'
+    events = ['Event A', 'Event B', 'Event C', 'Event D'] #Just using sample events here...
+
+    #render the template with the default values
+    return render_template('map.html',
+        stations = stations,
+        districts = districts,
+        precincts = precincts,
+        dataset = dataset,
+        events = events,
+        detection_method = detection_method,
+        show_stations = show_stations,
+        show_trips = show_trips,
+        show_events = show_events,
+        end_date_time = end_date_time,
+        start_date_time = start_date_time
+    )
 
 @socketio.on('settings_updated')
 def handle_settings_updated(message):
@@ -36,9 +57,7 @@ def handle_settings_updated(message):
     detection_method = message.values()[0]
 
     #Do something with dataset and detection_method below...
-    print dataset
-    print detection_method
-
+    print message
 @socketio.on('parameters_updated')
 def handle_settings_updated(message):
     show_stations = message.values()[0]
@@ -48,10 +67,11 @@ def handle_settings_updated(message):
     start_date_time = message.values()[3]
 
     if(end_date_time != '' and start_date_time != ''):
-        data_matching_criteria = get_trips_beginning_between_times(start_date_time, end_date_time)
-        detected_events = detect_events(data_matching_criteria)
-
-        print 'done'
+        print 'valid times'
 
     #Do something with all of these values below...
     #might be good to implement some kind of way of checking for changes s
+
+    print show_stations
+    print show_trips
+    print show_events

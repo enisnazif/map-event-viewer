@@ -58,7 +58,7 @@
 				            $(function () {
 											var dateNow = new Date();
 											$('#start_timepicker').datetimepicker({
-													defaultDate:'01-01-2013 00:00:00'
+													defaultDate: {{ start_date_time | tojson }}
 											});
 				            });
 									</script>
@@ -72,22 +72,20 @@
 					            $(function () {
 												var dateNow = new Date();
 								        $('#end_timepicker').datetimepicker({
-								            defaultDate:dateNow
+								            defaultDate: {{ end_date_time | tojson }}
 								        });
 					            });
 					        </script>
 							<br>
-								<label> Stations</label>
+									<label>Display</label>
 									<div class="checkbox">
-									  <label><input type="checkbox" id='toggle_stations'></label>
+									  <label><input type="checkbox" {% if show_stations == 'True' %} checked="checked" {% endif %} id='toggle_stations'>Stations</label>
 									</div>
-								<label>Events</label>
 									<div class="checkbox">
-									  <label><input type="checkbox" id='toggle_events'></label>
+									  <label><input type="checkbox" {% if show_events == 'True' %} checked="checked" {% endif %} id='toggle_events'>Events</label>
 									</div>
-								<label>Trips</label>
 									<div class="checkbox">
-									  <label><input type="checkbox" checked="checked" id='toggle_trips'></label>
+									  <label><input type="checkbox" {% if show_trips == 'True' %} checked="checked" {% endif %} id='toggle_trips'>Trips</label>
 									</div>
 									<script>
 										$(function() {
@@ -124,10 +122,9 @@
 							<br>
 							<label>Detected Events</label>
 							<ul id="events">
-								<li> Event 1 </li>
-								<li> Event 2 </li>
-								<li> Event 3 </li>
-								<li> Event 4 </li>
+								{% for event in events %}
+						        <li>{{ event }}</a></li>
+						    {% endfor %}
 							</ul>
 					</div>
 
@@ -155,6 +152,10 @@
 											$('#dataset').change(function() {
 															remove_map()
 															draw_map($("#dataset :selected").text())
+															if($("#dataset :selected").text() == 'Divvy') {
+																plot_regions({{ precincts | tojson }})
+																plot_stations({{ stations | tojson }})
+															}
 															socket.emit('settings_updated', {dataset: $("#dataset :selected").text(), detection_method: $("#detection_method :selected").text()});
 											});
 										});
@@ -180,7 +181,7 @@
 		{% if dataset == 'Divvy' %}
 			<script>
 			draw_map({{ dataset | tojson }})
-			plot_districts({{ districts | tojson }})
+			plot_regions({{ precincts | tojson }})
 			plot_stations({{ stations | tojson }})
 			</script>
 		{% endif %}

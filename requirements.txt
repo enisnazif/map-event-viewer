@@ -1,9 +1,9 @@
 argh==0.26.2
 click==6.6
+eventlet==0.19.0
 Flask==0.11.1
-Flask-SQLAlchemy==2.1
-GeoAlchemy==0.7.2
-GeoAlchemy2==0.3.0
+Flask-SocketIO==2.7.1
+greenlet==0.4.10
 itsdangerous==0.24
 Jinja2==2.8
 MarkupSafe==0.23
@@ -14,9 +14,10 @@ psycopg2==2.6.2
 py==1.4.31
 pytest==3.0.3
 python-dateutil==2.5.3
+python-engineio==1.0.3
+python-socketio==1.6.0
 pytz==2016.7
 PyYAML==3.12
 six==1.10.0
-SQLAlchemy==1.1.1
 watchdog==0.8.3
 Werkzeug==0.11.11
