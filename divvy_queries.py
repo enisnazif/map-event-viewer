@@ -96,7 +96,7 @@ def get_trips_terminating_in_precinct(precinct):
     return result
 
 def get_trips_going_between_districts(start_district, end_district):
-    cursor.execute("SELECT * FROM TRIPS t WHERE t.from_station_name IN (SELECT s.name FROM PRECINCTS p, STATIONS s WHERE p.geom && s.geom AND ST_Contains(p.geom, s.geom) AND p.precinct="+start_precinct+") AND t.to_station_name IN (SELECT s.name FROM PRECINCTS p, STATIONS s WHERE p.geom && s.geom AND ST_Contains(p.geom, s.geom) AND p.precinct="+end_precinct+");")
+    cursor.execute("SELECT * FROM TRIPS t WHERE t.from_station_name IN (SELECT s.name FROM DISTRICTS d, STATIONS s WHERE d.geom && s.geom AND ST_Contains(d.geom, s.geom) AND d.area_numbe='"+start_district+"') AND t.to_station_name IN (SELECT s.name FROM DISTRICTS d, STATIONS s WHERE d.geom && s.geom AND ST_Contains(d.geom, s.geom) AND d.area_numbe='"+end_district+"');")
     result = cursor.fetchall()
     return result
 
