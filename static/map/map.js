@@ -49,6 +49,7 @@ function plot_stations(stations)
     opacity: 1,
     fillOpacity: 0.8
 		};
+
 		var stationsLayer = {
 			"type": "Feature",
 			"properties": {
@@ -69,21 +70,21 @@ function plot_stations(stations)
 }
 
 //Accepts a list of districts and plots them as a layer on the map
-function plot_districts(districts)
+function plot_regions(regions)
 {
-	for(var i = 0; i < districts.length; i++)
+	for(var i = 0; i < regions.length; i++)
 	{
-		var districtsLayer = {
+		var regionsLayer = {
 	    "type": "Feature",
 	    "properties": {
-	        "name": districts[i][1]
+	        "name": regions[i][0]
 	    },
 	    "geometry": {
-	        "type": JSON.parse(districts[i][2]).type,
-	        "coordinates": JSON.parse(districts[i][2]).coordinates
+	        "type": JSON.parse(regions[i][1]).type,
+	        "coordinates": JSON.parse(regions[i][1]).coordinates
 	    }
 		};
 
-		L.geoJSON(districtsLayer).addTo(map).bindPopup(districtsLayer.properties.name);
+		L.geoJSON(regionsLayer).addTo(map).bindPopup(regionsLayer.properties.name);
 	}
 }
