@@ -23,7 +23,24 @@
 
 	<!--initialise socketio connection-->
 	<script type="text/javascript" charset="utf-8">
-	    var socket = io.connect('http://' + document.domain + ':' + location.port);
+	  var socket = io.connect('http://' + document.domain + ':' + location.port + '/divvy');
+	</script>
+
+	<!--listener for the trips_updated message sent by the client. This should update the events shown in the 'events' pane-->
+	<script type="text/javascript" charset="utf-8">
+		socket.on('trips_updated', function(data) {
+				//plot the trips on the map
+				plot_trips(data)
+		});
+	</script>
+
+	<!--listener for the events_update message sent by the client. This should update the events shown in the 'events' pane-->
+	<script type="text/javascript" charset="utf-8">
+		socket.on('events_updated', function(data) {
+				//update the events_list div with the new HTML in data
+				//plot the events on the map
+				$('#events_list').html(data)
+		});
 	</script>
 </head>
 
@@ -56,9 +73,9 @@
 			            </div>
 			        		<script type="text/javascript">
 				            $(function () {
-											var dateNow = new Date();
 											$('#start_timepicker').datetimepicker({
-													defaultDate: {{ start_date_time | tojson }}
+													defaultDate: {{ start_date_time | tojson }},
+													format: 'YYYY-MM-DD HH:mm'
 											});
 				            });
 									</script>
@@ -70,13 +87,16 @@
 			            </div>
 					        <script type="text/javascript">
 					            $(function () {
-												var dateNow = new Date();
 								        $('#end_timepicker').datetimepicker({
-								            defaultDate: {{ end_date_time | tojson }}
+								            defaultDate: {{ end_date_time | tojson }},
+														format: 'YYYY-MM-DD HH:mm'
 								        });
 					            });
 					        </script>
-							<br>
+									<br>
+									<button id="time_update_button" type="button"> Update Date / Time Range </button>
+									<br>
+									<br>
 									<label>Display</label>
 									<div class="checkbox">
 									  <label><input type="checkbox" {% if show_stations == 'True' %} checked="checked" {% endif %} id='toggle_stations'>Stations</label>
@@ -87,28 +107,39 @@
 									<div class="checkbox">
 									  <label><input type="checkbox" {% if show_trips == 'True' %} checked="checked" {% endif %} id='toggle_trips'>Trips</label>
 									</div>
+									<div class="checkbox">
+										<label><input type="checkbox" {% if show_trips == 'True' %} checked="checked" {% endif %} id='toggle_regions'>Regions</label>
+									</div>
 									<script>
 										$(function() {
-											$('#toggle_trips, #toggle_events, #toggle_stations').change(function() {
-															socket.emit('parameters_updated', {
-																date_start: document.getElementById('start_date_time').value,
-																date_end: document.getElementById('end_date_time').value,
-																show_stations: document.getElementById('toggle_stations').checked,
-																show_events: document.getElementById('toggle_events').checked,
-																show_trips: document.getElementById('toggle_trips').checked
-															});
+											$('#toggle_regions').change(function() {
+													toggle_regions()
 											});
 										});
 
-										//bit of a hack, but required to get the date/time changes
 										$(function() {
-											$('#start_timepicker, #end_timepicker').on("dp.hide",function() {
-															socket.emit('parameters_updated', {
+											$('#toggle_stations').change(function() {
+													toggle_stations()
+											});
+										});
+
+										$(function() {
+											$('#toggle_trips').change(function() {
+													toggle_trips()
+											});
+										});
+
+										$(function() {
+											$('#toggle_events').change(function() {
+													toggle_events()
+											});
+										});
+
+										$(function() {
+											$('#time_update_button').on("click",function() {
+															socket.emit('datetime_range_updated', {
 																date_start: document.getElementById('start_date_time').value,
 																date_end: document.getElementById('end_date_time').value,
-																show_stations: document.getElementById('toggle_stations').checked,
-																show_events: document.getElementById('toggle_events').checked,
-																show_trips: document.getElementById('toggle_trips').checked
 															});
 											});
 										});
@@ -121,11 +152,9 @@
 							<h1 class="sidebar-header">Events<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
 							<br>
 							<label>Detected Events</label>
-							<ul id="events">
-								{% for event in events %}
-						        <li>{{ event }}</a></li>
-						    {% endfor %}
-							</ul>
+							<div id="events_list">
+
+							</div>
 					</div>
 
 					<!-- Content of settings pane -->
@@ -133,40 +162,22 @@
 							<h1 class="sidebar-header">Settings<span class="sidebar-close"><i class="fa fa-caret-left"></i></span></h1>
 							<br>
 								<form id='settings_form'>
-									<label>Dataset</label>
-								  <select class="form-control" name="dataset" id="dataset">
-									  <option {% if dataset == 'Divvy' %} selected="selected" {% endif %}>Divvy</option>
-									  <option {% if dataset == 'New York Taxi' %} selected="selected" {% endif %}>New York Taxi</option>
-									</select>
-									<br>
 									<label>Detection Method</label>
 									<select class="form-control" name="detection_method" id="detection_method">
 										<option {% if detection_method == 'Method A' %} selected="selected" {% endif %}>Method A</option>
 										<option {% if detection_method == 'Method B' %} selected="selected" {% endif %}>Method B</option>
 										<option {% if detection_method == 'Method C' %} selected="selected" {% endif %}>Method C</option>
 									</select>
+									<br>
+									<button id="dm_update_button" type="button"> Update Detection Method </button>
 
-									<!-- A script that destroys the current map, and draws a new one when the dataset is changed-->
+									<!-- A script that updates the detection method when the button is clicked-->
 									<script>
 										$(function() {
-											$('#dataset').change(function() {
-															remove_map()
-															draw_map($("#dataset :selected").text())
-															if($("#dataset :selected").text() == 'Divvy') {
-																plot_regions({{ precincts | tojson }})
-																plot_stations({{ stations | tojson }})
-															}
-															socket.emit('settings_updated', {dataset: $("#dataset :selected").text(), detection_method: $("#detection_method :selected").text()});
+											$('#dm_update_button').on("click", function() {
+													socket.emit('detection_method_updated', {new_detection_method: $("#detection_method :selected").text()});
 											});
 										});
-
-										$(function() {
-											$('#detection_method').change(function() {
-															socket.emit('settings_updated', {dataset: $("#dataset :selected").text(), detection_method: $("#detection_method :selected").text()});
-											});
-										});
-
-
 									</script>
 								</form>
 					</div>
@@ -178,19 +189,10 @@
 	<script src="/static/bower_components/sidebar-v2/js/leaflet-sidebar.js"></script>
 
 	<!--This is where the map is actually drawn and plotted upon-->
-		{% if dataset == 'Divvy' %}
-			<script>
-			draw_map({{ dataset | tojson }})
-			plot_regions({{ precincts | tojson }})
-			plot_stations({{ stations | tojson }})
-			</script>
-		{% endif %}
-		{% if dataset == 'New York Taxi' %}
-			<script>
-			draw_map({{ dataset | tojson }})
-			</script>
-		{% endif %}
-
+	<script>
+		draw_map('Divvy')
+		plot_regions({{ regions | tojson }})
+		plot_stations({{ stations | tojson }})
 	</script>
 </body>
 
